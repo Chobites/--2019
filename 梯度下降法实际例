@@ -44,3 +44,5 @@ def gradient_decent_runner(x_data,y_data,b.k.lr,epochs):
             plt.plot(x_data,k*y_data+b,'r')
             plt.show()
     return b,k
+    #-----------------------------
+    print("开始是 b= {0},k={0},error={2}".format(b,k,compute_error(b,k,x)data,y_data))

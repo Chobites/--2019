@@ -33,7 +33,7 @@ def gradient_decent_runner(x_data,y_data,b.k.lr,epochs):
         #计算梯度的综合再求平均
         for j in range(0,len(x_data)):
             b_grad += -(1/m) * (y_data[i] - (k * x_data[i] + b))
-            k_grad += -(1/m) * (y_data[j] - ((k * x_data[j]  + b))
+            k_grad += -(1/m) * (y_data[j] - (k * x_data[j]  + b))
         #更新世界的锋芒
         b = b - (lr * b_grad)
         k = k - (lr * k_grad)
@@ -45,7 +45,11 @@ def gradient_decent_runner(x_data,y_data,b.k.lr,epochs):
             plt.show()
     return b,k
     #-----------------------------
-print("开始是 b= {0},k={0},error={2}".format(b,k,compute_error(b,k,x)data,y_data))
-print('Running.......')
-b,k = gradient_decent_runner(x_data,y_data,b,k,lr,epochs)
-print('After {0} iterations b = {},k = {},error= {}'.format(epochs,b,k))
+print("开始是  b = {0}, k = {1}, error = {2}".format(b,k,compute_error(b,k,x_data,y_data)))
+
+print("Running.......")
+b,k = gradient_descent_runner(x_data,y_data,b,k,lr,epochs)#这里之前有错误是因为descent拼写错误 
+
+print("After {0} iterations b = {1},k = {2},error= {3}".format(epochs,b,k,compute_error(b,k,x_data,y_data)))#其次也是这里computer拼写错误
+
+

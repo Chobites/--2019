@@ -1,0 +1,96 @@
+import pandas as pd
+import numpy as np
+np.set_printoptions(suppress=True)
+import tushare as ts
+import time
+import math
+import xlwt
+import itertools
+
+filename = 'D:/999999/中金波动率量比收益率回归/2019-06-13_portfolio.csv'            #'G:/家里办公/20190312/2019-03-12_portfolio.csv'#拿到持仓
+f = open(filename)
+dataframe = df = pd.read_csv(f,header=None,names=['stocks','volume',],sep=',')#这个sep就是按照逗号来分割的，我之前用空格，结果没有分开这个列，names就是给列重命名
+print(df.head())
+print(df.tail)
+
+stockpd = dataframe['stocks']
+volumepd = dataframe['volume']
+train_data = np.array(stockpd)
+stocks_list = train_data.tolist()
+
+YR109_data_adress = open('D:/999999/中金波动率量比收益率回归/109收益.csv')
+YR109_DATE = pd.read_csv(YR109_data_adress)
+yr109_date = np.array(YR109_DATE).tolist()
+print(yr109_date)
+
+for date_name in yr109_date:
+    v_stockMarketValue = []
+    profolio_volitility_list = []
+    for j in stocks_list:
+       ## print('股票代码：',j[0:6])
+        data_firstday = ts.get_hist_data(j[0:6],start=date_name[0],end=date_name[0])#拿出单个股票所有数据,6月有21天，一年的交易日262
+        data_i = data_firstday['close']
+        a = data_j = data_i.values
+       ## print('收盘价：',data_j)
+        data_volume = df.loc[df['stocks']==j]
+        #print('持仓量：',data_volume['volume'].values)
+        b = data_volume['volume'].values
+        stockMarketValue = a*b
+       ## print('单票市值：',stockMarketValue)
+        smv = stockMarketValue.tolist()
+       ## print(smv)
+        v_stockMarketValue.append(smv)
+
+        #接下来计算股票的占比权重
+        #总市值，固定的
+        #单票市值，遍历一下
+        time.sleep(0.1)
+    ##print(v_stockMarketValue)
+    print(v_stockMarketValue)
+    print(type(v_stockMarketValue))
+    Biglist = np.sum(v_stockMarketValue)
+    print('总市值：',np.sum(Biglist))
+
+    allMarketValue = np.sum(Biglist)
+
+    for k in stocks_list:
+        print('股票代码：',k[0:6])
+        data_firstday = ts.get_hist_data(k[0:6],start='2019-06-13',end='2019-10-24')#拿出单个股票所有数据,6月有21天，一年的交易日262
+        data_m = data_firstday['close']
+
+        c = data_n = data_m.values
+        data_volume = df.loc[df['stocks']==k]
+
+        d = data_volume['volume'].values
+
+        #print('c',c)
+        #print('d',d)
+        stockMarketValue = c*d
+        #print('单票  市值占比：',stockMarketValue/allMarketValue)
+        stock_percentage = stockMarketValue/allMarketValue #收益比率是要乘以这个是指占比的才行
+        #print(stock_percentage)#这里有90个交易日，有90个数据但是
+        #print(k[0:6])
+        data_firstday = ts.get_hist_data(k[0:6], start='2019-06-12',end='2019-10-25')  # 这个地方和下面的72行的有关系，因为掐头去尾，所以和90天90个收盘价的数据无法对其，所以首尾两天都扩展一天，然后去掉首尾
+        data_o = data_firstday['close']
+        data_p = data_o.values
+        diffClosePrice = data_o.diff() / data_o[:-1]
+        #print(diffClosePrice.values)
+        returns = diffClosePrice.values[1:91]#这个是掐头去尾的，6月份的交易日的特殊情况，以后要自己再设置，因为是后面数减去面前的数，所以第一个和最后一个都没有数值，是NAN
+        correct_returns = stock_percentage*returns
+
+        #print(diffClosePrice.values)
+        #print('标准差：', np.std(returns))
+        stocksVolatility = np.std(correct_returns)
+        #print(stocksVolatility)
+        finalVotilily = stocksVolatility * math.sqrt(90)
+
+        print('加权当月波动率:',finalVotilily)
+        if stock_percentage*finalVotilily is   None:
+            pass
+        else:
+            listV = [k,finalVotilily]
+            profolio_volitility_list.append(listV)
+        time.sleep(0.1)
+        df_v = pd.DataFrame(profolio_volitility_list,columns=['stock name','History Volitility'])
+        df_v.to_excel('D:/999999/YR109波动率'+date_name[0]+'.xlsx',index=False)
+#print('总6月历史波动率：',np.sum(profolio_volitility_list))

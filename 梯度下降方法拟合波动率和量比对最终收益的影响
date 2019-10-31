@@ -1,0 +1,49 @@
+import pandas as pd
+import numpy as np
+import tushare as ts
+import time
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from numpy import genfromtxt
+from sklearn import linear_model
+
+
+f = open("D:/999999/YR109数据分析/YR109DATA.csv")
+dataframe = pd.read_csv(f,header=None,names=['X1','X2','Y'],sep=',')
+#print(dataframe.info)
+data = genfromtxt(r'D:/999999/YR109数据分析/YR109DATA.csv',delimiter=',')#这种读取方法就直接变成了列表了，而且是这种一行是一个小列表的组合，非常好用哦亲
+print(data)
+
+x_data = data[:,:-1]
+y_data = data[:,-1]
+print(x_data)
+print(y_data)
+model = linear_model.LinearRegression()
+model.fit(x_data, y_data)
+# 系数
+print("coefficients:",model.coef_)
+
+# 截距
+print("intercept:",model.intercept_)
+
+# 测试
+x_test = [[102,4]]
+predict = model.predict(x_test)
+print("predict:",predict)
+
+ax = plt.figure().add_subplot(111, projection='3d')
+ax.scatter(x_data[:, 0], x_data[:, 1], y_data, c='r', marker='o', s=100)  # 点为红色三角形
+x0 = x_data[:, 0]
+x1 = x_data[:, 1]
+# 生成网格矩阵
+x0, x1 = np.meshgrid(x0, x1)
+z = model.intercept_ + x0 * model.coef_[0] + x1 * model.coef_[1]
+# 画3D图
+ax.plot_surface(x0, x1, z)
+# 设置坐标轴
+ax.set_xlabel('liangbi')
+ax.set_ylabel('bodonglv')
+ax.set_zlabel('shiji shouyi')
+
+# 显示图像
+plt.show()

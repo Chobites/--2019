@@ -1,0 +1,73 @@
+#获取成交记录和成交统计
+#路径
+#建立邮件文本
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+
+mail_host = "smtp.exmail.qq.com"
+mail_user = "hengxuan.li@quant-trading.ai"
+mail_password = "kn39ScSSX8byuc2Q"
+
+#确定客户收件人列表
+account = ['86514875@qq.com','1006902326@qq.com','lhx00lhx@163.com']
+
+#文件地址路径
+YR1 = 'G:/家里办公/20190414/1.csv'
+YR2 = 'G:/家里办公/20190414/2.csv'
+YR3 = 'G:/家里办公/20190414/3.csv'
+
+sender = "hengxuan.li@quant-trading.ai"
+receiver = account#['86514875@qq.com']
+
+
+letter = MIMEMultipart()
+letter_partone = MIMEText(_text="YR135"+
+                                "\n"+
+                                "尊敬的客户，您好！您的账户[666800009436]于[2019年12月06日]当日可交易市值为[101609734.46]元，通过AI交易收益为[-3042.873]元，收益率[-0.003%]【上海跃然信息技术有限公司】",
+                          _charset='utf-8')#这里是正文
+
+#读取文件，这里可以遍历，每次拿的文件也不一样
+letter_parttwo = MIMEApplication(open(r'G:\家里办公\20190414\成交记录2019-04-12.csv','rb').read(),'rb')
+letter_parttwo2 = MIMEApplication(open(r'G:\家里办公\20190414\成交记录2019-04-12123123132.csv','rb').read(),'rb')
+
+letter['From'] = Header("上海跃然信息技术有限公司","UTF-8")
+letter['To'] = Header("YR135","UTF-8")
+letter['Subject'] = Header("跃然人工智能日内交易收益统计","UTF-8")
+
+letter_parttwo.add_header('Content-Disposition', 'attachment', filename='成交记录2019-04-12.csv')
+letter_parttwo2.add_header('Content-Disposition', 'attachment', filename='成交记录2019-04-12123123132.csv')
+letter.attach(letter_partone)
+letter.attach(letter_parttwo)
+letter.attach(letter_parttwo2)
+
+
+
+
+mail = smtplib.SMTP()
+mail.connect(mail_host,25)
+mail.login(mail_user,mail_password)
+mail.sendmail(sender,receiver,letter.as_string())
+print('邮件发送成功！')
+
+
+
+
+
+
+
+#确定邮件发送对象
+"""
+外面写一个方法类
+发送邮件就是一个类的实例
+把客户按照客户来分类
+最后用搞一个IF或者什么来控制开关
+发什么发什么怎么搞
+因为具体的时候，有些能发，有些不能发
+"""
+
+
+#分类添加附件
+#发送邮件
